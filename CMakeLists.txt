@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.14)
 project(xiangqi_auto CXX)
 
 set(APP_NAME "xiangqi_auto")
-
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
@@ -14,7 +13,6 @@ file(GLOB_RECURSE SRC_LIST
   "./src/*.cpp"
 )
 
-set(SRCS ./src/main.cpp)
 
 # User-configurable library paths
 set(OPENCV_LIB "" CACHE PATH "Path to OpenCV build directory")
@@ -73,9 +71,9 @@ target_include_directories(imgui PUBLIC
   "${IMGUI_DIR}/backends"
 )
 
-add_executable(${APP_NAME} WIN32 ${SRCS} ${SRC_LIST} ${HEADER_LIST})
+add_executable(${APP_NAME} WIN32 ${SRC_LIST} ${HEADER_LIST})
 
-target_link_libraries(${APP_NAME} imgui ${DEPS}
+target_link_libraries(${APP_NAME} imgui
   ${OpenCV_LIBS}
   onnxruntime
   user32
@@ -109,7 +107,6 @@ target_sources(${APP_NAME} PRIVATE
 source_group(
   TREE "${CMAKE_SOURCE_DIR}"
   FILES
-    ${SRCS}
     ${SRC_LIST}
     ${HEADER_LIST}
     ./src/xiangqi_auto.rc

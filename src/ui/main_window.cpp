@@ -35,10 +35,16 @@ void MainWindow::OnDraw()
     float current_width = io.DisplaySize.x;
     float current_height = io.DisplaySize.y;
 
+    float scale = m_dpiScale;
+    float title_height = 40.0f * scale;
+    float btn_width = 45.0f * scale;
+    float btn_height = 40.0f * scale;
+    float control_width = btn_width * 2.0f; // 90.0f scaled
+
     // Custom Title Bar Area
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
     ImVec2 title_bar_min = ImGui::GetWindowPos();
-    ImVec2 title_bar_max = ImVec2(title_bar_min.x + current_width, title_bar_min.y + 40.0f);
+    ImVec2 title_bar_max = ImVec2(title_bar_min.x + current_width, title_bar_min.y + title_height);
     draw_list->AddRectFilled(title_bar_min, title_bar_max, IM_COL32(26, 26, 28, 255));
 
     // Custom dragging logic when clicking the title bar
@@ -50,7 +56,7 @@ void MainWindow::OnDraw()
         float local_y = mouse_pos.y - window_pos.y;
 
         // Only drag if mouse is in the title bar area and not on control buttons (which are on the right)
-        if (local_y >= 0.0f && local_y <= 40.0f && local_x >= 0.0f && local_x < (current_width - 90.0f))
+        if (local_y >= 0.0f && local_y <= title_height && local_x >= 0.0f && local_x < (current_width - control_width))
         {
             ::ReleaseCapture();
             ::SendMessageW(m_hwnd, WM_SYSCOMMAND, SC_MOVE | HTCAPTION, 0);
@@ -58,7 +64,7 @@ void MainWindow::OnDraw()
     }
 
     // Title Bar Label
-    ImGui::SetCursorPos(ImVec2(15.0f, 12.0f));
+    ImGui::SetCursorPos(ImVec2(15.0f * scale, 12.0f * scale));
     ImGui::Text("Xiangqi Auto");
 
     // Control buttons (Minimize and Close) styling
@@ -66,9 +72,9 @@ void MainWindow::OnDraw()
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.3f, 0.3f, 0.35f, 0.6f));
 
     // Minimize Button
-    ImGui::SetCursorPos(ImVec2(current_width - 90.0f, 0.0f));
+    ImGui::SetCursorPos(ImVec2(current_width - control_width, 0.0f));
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.22f, 0.22f, 0.24f, 1.0f));
-    bool minimize_clicked = ImGui::Button("##Minimize", ImVec2(45.0f, 40.0f));
+    bool minimize_clicked = ImGui::Button("##Minimize", ImVec2(btn_width, btn_height));
     ImGui::PopStyleColor();
 
     // Draw minimize vector icon
@@ -80,7 +86,7 @@ void MainWindow::OnDraw()
         ImVec2(min_btn_pos.x + min_btn_size.x * 0.38f, min_btn_pos.y + min_btn_size.y * 0.55f),
         ImVec2(min_btn_pos.x + min_btn_size.x * 0.62f, min_btn_pos.y + min_btn_size.y * 0.55f),
         min_color,
-        1.5f
+        1.5f * scale
     );
 
     if (minimize_clicked)
@@ -89,9 +95,9 @@ void MainWindow::OnDraw()
     }
 
     // Close Button
-    ImGui::SetCursorPos(ImVec2(current_width - 45.0f, 0.0f));
+    ImGui::SetCursorPos(ImVec2(current_width - btn_width, 0.0f));
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.85f, 0.15f, 0.15f, 1.0f)); // Premium red hover
-    bool close_clicked = ImGui::Button("##Close", ImVec2(45.0f, 40.0f));
+    bool close_clicked = ImGui::Button("##Close", ImVec2(btn_width, btn_height));
     ImGui::PopStyleColor();
 
     // Draw close vector icon (X)
@@ -105,13 +111,13 @@ void MainWindow::OnDraw()
         ImVec2(cls_btn_pos.x + cls_btn_size.x * pad_ratio_min, cls_btn_pos.y + cls_btn_size.y * pad_ratio_min),
         ImVec2(cls_btn_pos.x + cls_btn_size.x * pad_ratio_max, cls_btn_pos.y + cls_btn_size.y * pad_ratio_max),
         cls_color,
-        1.5f
+        1.5f * scale
     );
     draw_list->AddLine(
         ImVec2(cls_btn_pos.x + cls_btn_size.x * pad_ratio_max, cls_btn_pos.y + cls_btn_size.y * pad_ratio_min),
         ImVec2(cls_btn_pos.x + cls_btn_size.x * pad_ratio_min, cls_btn_pos.y + cls_btn_size.y * pad_ratio_max),
         cls_color,
-        1.5f
+        1.5f * scale
     );
 
     if (close_clicked)
@@ -123,8 +129,8 @@ void MainWindow::OnDraw()
     ImGui::PopStyleColor(2);
 
     // Content Area
-    ImGui::SetCursorPos(ImVec2(20.0f, 60.0f));
-    ImGui::BeginChild("ContentArea", ImVec2(current_width - 40.0f, current_height - 80.0f), false, ImGuiWindowFlags_None);
+    ImGui::SetCursorPos(ImVec2(20.0f * scale, 60.0f * scale));
+    ImGui::BeginChild("ContentArea", ImVec2(current_width - 40.0f * scale, current_height - 80.0f * scale), false, ImGuiWindowFlags_None);
 
     ImGui::Text("Dear ImGui integration completed successfully!");
     ImGui::Separator();
@@ -138,7 +144,7 @@ void MainWindow::OnDraw()
     ImGui::Spacing();
 
     static bool show_demo_window = false;
-    if (ImGui::Button(show_demo_window ? "Hide Demo Window" : "Show Demo Window", ImVec2(180.0f, 30.0f)))
+    if (ImGui::Button(show_demo_window ? "Hide Demo Window" : "Show Demo Window", ImVec2(180.0f * scale, 30.0f * scale)))
     {
         show_demo_window = !show_demo_window;
     }

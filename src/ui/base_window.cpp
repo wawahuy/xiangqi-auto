@@ -169,17 +169,41 @@ bool BaseWindow::Create()
     styleVar.AntiAliasedLinesUseTex = true;
     styleVar.AntiAliasedFill = true;
 
-    // Load vector font for smooth text rendering
+    // Load vector font for smooth text rendering with Vietnamese and Chinese support
     char windowsDir[MAX_PATH];
     if (::GetWindowsDirectoryA(windowsDir, MAX_PATH) > 0)
     {
         char fontPath[MAX_PATH];
+        ImFontConfig config;
+
+        // 1. Load Segoe UI or Arial as the base font with Vietnamese support
         ::sprintf_s(fontPath, MAX_PATH, "%s\\Fonts\\segoeui.ttf", windowsDir);
-        ImFont* font = io.Fonts->AddFontFromFileTTF(fontPath, 17.0f * m_dpiScale);
+        ImFont* font = io.Fonts->AddFontFromFileTTF(fontPath, 17.0f * m_dpiScale, nullptr, io.Fonts->GetGlyphRangesVietnamese());
         if (font == nullptr)
         {
             ::sprintf_s(fontPath, MAX_PATH, "%s\\Fonts\\arial.ttf", windowsDir);
-            io.Fonts->AddFontFromFileTTF(fontPath, 17.0f * m_dpiScale);
+            font = io.Fonts->AddFontFromFileTTF(fontPath, 17.0f * m_dpiScale, nullptr, io.Fonts->GetGlyphRangesVietnamese());
+        }
+
+        // 2. Merge Chinese Simplified common glyphs from Microsoft YaHei or SimSun if available
+        config.MergeMode = true;
+        config.PixelSnapH = true;
+
+        ::sprintf_s(fontPath, MAX_PATH, "%s\\Fonts\\msyh.ttc", windowsDir); // Microsoft YaHei
+        FILE* f = nullptr;
+        if (::fopen_s(&f, fontPath, "rb") == 0 && f != nullptr)
+        {
+            ::fclose(f);
+            io.Fonts->AddFontFromFileTTF(fontPath, 17.0f * m_dpiScale, &config, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
+        }
+        else
+        {
+            ::sprintf_s(fontPath, MAX_PATH, "%s\\Fonts\\simsun.ttc", windowsDir); // SimSun fallback
+            if (::fopen_s(&f, fontPath, "rb") == 0 && f != nullptr)
+            {
+                ::fclose(f);
+                io.Fonts->AddFontFromFileTTF(fontPath, 17.0f * m_dpiScale, &config, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
+            }
         }
     }
 
